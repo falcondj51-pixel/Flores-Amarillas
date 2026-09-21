@@ -54,27 +54,26 @@ body{
 
     opacity:0;
 
-    filter:blur(8px);
-
-    transform:translateY(20px);
+    transform:translate3d(0,20px,0);
 
     transition:
-        opacity 2s ease,
-        filter 2s ease,
-        transform 2s ease;
+        opacity 1.8s ease,
+        transform 1.8s ease;
 
     padding:30px;
+
+    will-change:opacity, transform;
 }
 
 .text.show{
     opacity:1;
-    filter:blur(0);
-    transform:translateY(0);
+    transform:translate3d(0,0,0);
 }
 
 .text.hide{
     opacity:0;
-    filter:blur(8px);
+    transform:translate3d(0,-20px,0);
+}
     transform:translateY(-20px);
 }
 
