@@ -1,1148 +1,16 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Para ti 💛</title>
 
 <style>
 *{
+    box-sizing:border-box;
     margin:0;
     padding:0;
-    box-sizing:border-box;
-}
-
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#000;
-}
-
-body{
-    font-family:Georgia,"Times New Roman",serif;
-    color:#fff;
-}
-
-canvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-}
-
-#message{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:30px;
-    font-size:clamp(27px,5vw,52px);
-    line-height:1.35;
-    opacity:0;
-    transition:opacity 1s ease;
-    pointer-events:none;
-    z-index:5;
-}
-
-#message.visible{
-    opacity:1;
-}
-
-#hint{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:12%;
-    text-align:center;
-    font-size:18px;
-    letter-spacing:2px;
-    opacity:0;
-    transition:opacity .8s ease;
-    pointer-events:none;
-    z-index:6;
-}
-
-#hint.visible{
-    opacity:.8;
-}
-
-#heart{
-    position:fixed;
-    left:50%;
-    bottom:10%;
-    transform:translateX(-50%);
-    font-size:100px;
-    line-height:1;
-    color:#ffd83d;
-    text-shadow:
-        0 0 12px #ffd83d,
-        0 0 30px #ffb900,
-        0 0 60px rgba(255,190,0,.7);
-    opacity:0;
-    pointer-events:none;
-    z-index:10;
-    cursor:pointer;
-    user-select:none;
-    transition:opacity 1s ease;
-}
-
-#heart.visible{
-    opacity:1;
-    pointer-events:auto;
-    animation:heartPulse 1.4s ease-in-out infinite;
-}
-
-@keyframes heartPulse{
-    0%,100%{
-        transform:translateX(-50%) scale(1);
-    }
-
-    50%{
-        transform:translateX(-50%) scale(1.12);
-    }
-}
-
-#secret{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:30px;
-    font-size:clamp(27px,5vw,52px);
-    line-height:1.4;
-    opacity:0;
-    pointer-events:none;
-    z-index:20;
-    transition:opacity 1.5s ease;
-    text-shadow:0 0 25px rgba(255,215,80,.8);
-}
-
-#secret.visible{
-    opacity:1;
-}
-
-#audio{
-    display:none;
-}
-</style>
-</head>
-
-<body>
-
-<canvas id="canvas"></canvas>
-
-<div id="message"></div>
-
-<div id="hint">toca la flor</div>
-
-<div id="heart">♥</div>
-
-<div id="secret">
-    Y si algún día te preguntas<br>
-    por qué hice todo esto...<br><br>
-    la respuesta siempre vas a ser tú. 💛
-</div>
-
-<audio id="audio" preload="auto">
-    <source src="./Álvaro Díaz - Reina Pepiada (Lyric Video).mp3" type="audio/mpeg">
-</audio>
-
-<script>
-
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-const message = document.getElementById("message");
-const hint = document.getElementById("hint");
-const heart = document.getElementById("heart");
-const secret = document.getElementById("secret");
-const audio = document.getElementById("audio");
-
-let W;
-let H;
-let dpr;
-
-function resize(){
-
-    W = window.innerWidth;
-    H = window.innerHeight;
-
-    dpr = Math.min(window.devicePixelRatio || 1,1.5);
-
-    canvas.width = W*dpr;
-    canvas.height = H*dpr;
-
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-
-}
-
-resize();
-
-window.addEventListener("resize",resize);
-
-
-// ==================================================
-// ESTADO DE LA HISTORIA
-// ==================================================
-
-let scene = "intro1";
-let sceneTime = performance.now();
-
-function changeScene(newScene){
-
-    scene = newScene;
-    sceneTime = performance.now();
-
-    message.classList.remove("visible");
-    hint.classList.remove("visible");
-
-}
-
-function elapsed(){
-
-    return performance.now()-sceneTime;
-
-}
-
-
-// ==================================================
-// TEXTO
-// ==================================================
-
-function showMessage(text){
-
-    message.innerHTML = text;
-    message.classList.add("visible");
-
-}
-
-function hideMessage(){
-
-    message.classList.remove("visible");
-
-}
-
-
-// ==================================================
-// FLOR PRINCIPAL
-// ==================================================
-
-const flower = {
-    x:0,
-    y:0
-};
-
-function drawFlower(progress){
-
-    flower.x = W/2;
-    flower.y = H*.52;
-
-    const p = Math.min(progress,1);
-
-    ctx.save();
-
-    // Tallo
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        flower.x,
-        flower.y+15
-    );
-
-    ctx.quadraticCurveTo(
-        flower.x-20,
-        flower.y+110*p,
-        flower.x-5,
-        H
-    );
-
-    ctx.strokeStyle="#52752b";
-    ctx.lineWidth=7;
-    ctx.stroke();
-
-
-    // Hoja izquierda
-
-    if(p>.35){
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            flower.x-27,
-            flower.y+95,
-            17,
-            43,
-            -.65,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#668d32";
-        ctx.fill();
-
-    }
-
-
-    // Hoja derecha
-
-    if(p>.55){
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            flower.x+28,
-            flower.y+125,
-            17,
-            43,
-            .65,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#5c8230";
-        ctx.fill();
-
-    }
-
-
-    // Pétalos
-
-    const radius = 72*p;
-
-    for(let i=0;i<12;i++){
-
-        const angle =
-            i*Math.PI*2/12;
-
-        ctx.save();
-
-        ctx.translate(
-            flower.x,
-            flower.y
-        );
-
-        ctx.rotate(angle);
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            -radius*.65,
-            radius*.43,
-            radius*.78,
-            0,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#ffd83d";
-
-        ctx.fill();
-
-        ctx.restore();
-
-    }
-
-
-    // Centro
-
-    ctx.beginPath();
-
-    ctx.arc(
-        flower.x,
-        flower.y,
-        radius*.38,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#805117";
-    ctx.fill();
-
-
-    // Detalles del centro
-
-    for(let i=0;i<18;i++){
-
-        const a =
-            i*Math.PI*2/18;
-
-        const r = radius*.25;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            flower.x+Math.cos(a)*r,
-            flower.y+Math.sin(a)*r,
-            2,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#b87518";
-
-        ctx.fill();
-
-    }
-
-    ctx.restore();
-
-}
-
-
-// ==================================================
-// PARTÍCULAS
-// ==================================================
-
-const particles = [];
-
-function createBurst(x,y,count){
-
-    particles.length=0;
-
-    for(let i=0;i<count;i++){
-
-        const angle =
-            Math.random()*Math.PI*2;
-
-        const speed =
-            1+Math.random()*5;
-
-        particles.push({
-
-            x:x,
-            y:y,
-
-            vx:Math.cos(angle)*speed,
-            vy:Math.sin(angle)*speed,
-
-            size:1+Math.random()*4,
-
-            life:1
-
-        });
-
-    }
-
-}
-
-function drawParticles(){
-
-    for(let i=particles.length-1;i>=0;i--){
-
-        const p=particles[i];
-
-        p.x+=p.vx;
-        p.y+=p.vy;
-
-        p.vx*=.98;
-        p.vy*=.98;
-
-        p.vy+=.025;
-
-        p.life-=.018;
-
-        if(p.life<=0){
-
-            particles.splice(i,1);
-
-            continue;
-
-        }
-
-        ctx.globalAlpha=p.life;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#ffd84d";
-
-        ctx.fill();
-
-    }
-
-    ctx.globalAlpha=1;
-
-}
-
-
-// ==================================================
-// MARIPOSA
-// ==================================================
-
-function drawButterfly(progress){
-
-    const t=Math.min(progress,1);
-
-    const startX=W/2;
-    const startY=H*.52;
-
-    const endX=W+100;
-    const endY=H*.18;
-
-    const x =
-        startX+
-        (endX-startX)*t+
-        Math.sin(t*10)*35*(1-t);
-
-    const y =
-        startY+
-        (endY-startY)*t+
-        Math.sin(t*9)*40*(1-t);
-
-
-    const flap =
-        Math.sin(performance.now()*.025);
-
-
-    ctx.save();
-
-    ctx.translate(x,y);
-
-    ctx.rotate(-.2);
-
-
-    // Ala izquierda
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        -9,
-        -3,
-        15,
-        9+flap*3,
-        -.5,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#f6d56b";
-
-    ctx.fill();
-
-
-    // Ala derecha
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        9,
-        -3,
-        15,
-        9-flap*3,
-        .5,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#ffe18a";
-
-    ctx.fill();
-
-
-    // Cuerpo
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        0,
-        3,
-        11,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#4c371d";
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-// ==================================================
-// FLORES QUE CAEN
-// ==================================================
-
-const rainFlowers=[];
-
-function createRain(){
-
-    rainFlowers.length=0;
-
-    for(let i=0;i<55;i++){
-
-        rainFlowers.push({
-
-            x:Math.random()*W,
-
-            y:-Math.random()*H,
-
-            size:5+Math.random()*10,
-
-            speed:1.5+Math.random()*2.8,
-
-            sway:Math.random()*Math.PI*2,
-
-            rotation:Math.random()*Math.PI*2,
-
-            rotationSpeed:(Math.random()-.5)*.025,
-
-            alpha:.5+Math.random()*.5
-
-        });
-
-    }
-
-}
-
-function drawRainFlower(f){
-
-    ctx.save();
-
-    ctx.translate(f.x,f.y);
-
-    ctx.rotate(f.rotation);
-
-    ctx.globalAlpha=f.alpha;
-
-
-    // tallo
-
-    ctx.beginPath();
-
-    ctx.moveTo(0,0);
-
-    ctx.lineTo(0,f.size*2.5);
-
-    ctx.strokeStyle="#66863b";
-
-    ctx.lineWidth=1;
-
-    ctx.stroke();
-
-
-    // pétalos
-
-    for(let i=0;i<5;i++){
-
-        ctx.save();
-
-        ctx.rotate(
-            i*Math.PI*2/5
-        );
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            -f.size*.65,
-            f.size*.45,
-            f.size*.75,
-            0,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#ffd83d";
-
-        ctx.fill();
-
-        ctx.restore();
-
-    }
-
-
-    // centro
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        0,
-        f.size*.27,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#805117";
-
-    ctx.fill();
-
-    ctx.restore();
-
-}
-
-function updateRain(){
-
-    for(const f of rainFlowers){
-
-        f.y+=f.speed;
-
-        f.sway+=.025;
-
-        f.x+=Math.sin(f.sway)*.35;
-
-        f.rotation+=f.rotationSpeed;
-
-        if(f.y>H+30){
-
-            f.y=-20;
-
-            f.x=Math.random()*W;
-
-        }
-
-        drawRainFlower(f);
-
-    }
-
-}
-
-
-// ==================================================
-// FONDO
-// ==================================================
-
-function drawBackground(){
-
-    ctx.fillStyle="#020203";
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-}
-
-
-// ==================================================
-// LOOP PRINCIPAL
-// ==================================================
-
-function loop(){
-
-    drawBackground();
-
-    const time=elapsed();
-
-
-    // ----------------------------------------------
-    // INTRO
-    // ----------------------------------------------
-
-    if(scene==="intro1"){
-
-        if(time>300){
-
-            showMessage(
-                "Hay algo que quería darte..."
-            );
-
-        }
-
-        if(time>3300){
-
-            changeScene("intro2");
-
-            showMessage(
-                "pero no encontré la manera de hacerlo."
-            );
-
-        }
-
-    }
-
-
-    else if(scene==="intro2"){
-
-        if(time>3500){
-
-            changeScene("intro3");
-
-            showMessage(
-                "Así que hice esto."
-            );
-
-        }
-
-    }
-
-
-    else if(scene==="intro3"){
-
-        if(time>3300){
-
-            changeScene("light");
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // LUZ
-    // ----------------------------------------------
-
-    else if(scene==="light"){
-
-        const p=Math.min(time/1800,1);
-
-        const radius=
-            80+
-            p*450;
-
-        const gradient=
-            ctx.createRadialGradient(
-                W/2,
-                H*.55,
-                0,
-                W/2,
-                H*.55,
-                radius
-            );
-
-        gradient.addColorStop(
-            0,
-            "rgba(255,220,100,.9)"
-        );
-
-        gradient.addColorStop(
-            .3,
-            "rgba(255,190,50,.35)"
-        );
-
-        gradient.addColorStop(
-            1,
-            "rgba(0,0,0,0)"
-        );
-
-        ctx.fillStyle=gradient;
-
-        ctx.fillRect(
-            0,
-            0,
-            W,
-            H
-        );
-
-
-        if(time>1800){
-
-            changeScene("flower");
-
-            hint.classList.add("visible");
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // FLOR
-    // ----------------------------------------------
-
-    else if(scene==="flower"){
-
-        const p=Math.min(time/1700,1);
-
-        drawFlower(p);
-
-        if(p>=1){
-
-            hint.classList.add("visible");
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // MARIPOSA
-    // ----------------------------------------------
-
-    else if(scene==="butterfly"){
-
-        drawFlower(1);
-
-        const p=
-            Math.min(time/2300,1);
-
-        drawButterfly(p);
-
-        drawParticles();
-
-
-        if(time>500 && time<1700){
-
-            showMessage(
-                "Porque hay cosas que no caben en una simple flor."
-            );
-
-        }
-
-
-        if(p>=1){
-
-            createRain();
-
-            changeScene("rain");
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // LLUVIA DE FLORES
-    // ----------------------------------------------
-
-    else if(scene==="rain"){
-
-        updateRain();
-
-        if(time>1300){
-
-            changeScene("final");
-
-            showMessage(
-                "Y esta es mi pequeña manera<br>" +
-                "de darte algo bonito. 💛"
-            );
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // MENSAJE FINAL
-    // ----------------------------------------------
-
-    else if(scene==="final"){
-
-        updateRain();
-
-        if(time>2600){
-
-            changeScene("heart");
-
-            showMessage(
-                "Y esta es mi pequeña manera<br>" +
-                "de darte algo bonito. 💛"
-            );
-
-            heart.classList.add("visible");
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // CORAZÓN
-    // ----------------------------------------------
-
-    else if(scene==="heart"){
-
-        updateRain();
-
-    }
-
-
-    // ----------------------------------------------
-    // EXPLOSIÓN
-    // ----------------------------------------------
-
-    else if(scene==="explosion"){
-
-        updateRain();
-
-        drawParticles();
-
-        const p=
-            Math.min(time/2500,1);
-
-        const radius=
-            p*Math.max(W,H)*.9;
-
-        const gradient=
-            ctx.createRadialGradient(
-                W/2,
-                H/2,
-                0,
-                W/2,
-                H/2,
-                radius
-            );
-
-        gradient.addColorStop(
-            0,
-            "rgba(255,240,150,.85)"
-        );
-
-        gradient.addColorStop(
-            .25,
-            "rgba(255,210,70,.35)"
-        );
-
-        gradient.addColorStop(
-            1,
-            "rgba(255,190,0,0)"
-        );
-
-        ctx.fillStyle=gradient;
-
-        ctx.fillRect(
-            0,
-            0,
-            W,
-            H
-        );
-
-
-        if(time>300){
-
-            if(audio.paused){
-
-                audio.volume=.7;
-
-                audio.play().catch(()=>{});
-
-            }
-
-        }
-
-
-        if(time>2700){
-
-            changeScene("secret");
-
-            secret.classList.add("visible");
-
-        }
-
-    }
-
-
-    // ----------------------------------------------
-    // SECRETO
-    // ----------------------------------------------
-
-    else if(scene==="secret"){
-
-        updateRain();
-
-    }
-
-
-    requestAnimationFrame(loop);
-
-}
-
-requestAnimationFrame(loop);
-
-
-// ==================================================
-// TOCAR FLOR
-// ==================================================
-
-function touchFlower(x,y){
-
-    if(scene!=="flower"){
-        return;
-    }
-
-    const dx=x-flower.x;
-    const dy=y-flower.y;
-
-    const distance=
-        Math.sqrt(
-            dx*dx+
-            dy*dy
-        );
-
-    if(distance<120){
-
-        hint.classList.remove("visible");
-
-        createBurst(
-            flower.x,
-            flower.y,
-            120
-        );
-
-        changeScene("butterfly");
-
-    }
-
-}
-
-
-canvas.addEventListener(
-    "click",
-    function(e){
-
-        touchFlower(
-            e.clientX,
-            e.clientY
-        );
-
-    }
-);
-
-
-canvas.addEventListener(
-    "touchstart",
-    function(e){
-
-        const touch=e.touches[0];
-
-        touchFlower(
-            touch.clientX,
-            touch.clientY
-        );
-
-    },
-    {passive:true}
-);
-
-
-// ==================================================
-// CORAZÓN
-// ==================================================
-
-he<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para ti 💛</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
 }
 
 html,body{
@@ -1153,924 +21,572 @@ html,body{
 }
 
 body{
-    font-family:Georgia,"Times New Roman",serif;
+    font-family:Georgia,serif;
     color:white;
 }
 
-canvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-}
+/* ESCENAS */
 
-#message{
+.scene{
     position:fixed;
     inset:0;
     display:flex;
     align-items:center;
     justify-content:center;
+    flex-direction:column;
     text-align:center;
-    padding:30px;
-    font-size:clamp(27px,5vw,52px);
-    line-height:1.4;
+    padding:25px;
     opacity:0;
-    transition:opacity .8s ease;
-    pointer-events:none;
+    visibility:hidden;
+    transition:opacity 1s ease;
+}
+
+.scene.active{
+    opacity:1;
+    visibility:visible;
+}
+
+
+/* TEXTOS */
+
+.introText{
+    font-size:clamp(27px,6vw,52px);
+    line-height:1.4;
+    max-width:850px;
+}
+
+.fade{
+    animation:fadeIn 1.2s ease forwards;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+
+/* ESCENA FLOR */
+
+#flowerScene{
+    background:
+        radial-gradient(
+            circle at center,
+            #29220c 0%,
+            #0d0b05 45%,
+            #020202 100%
+        );
+}
+
+.flower{
+    position:relative;
+    width:180px;
+    height:350px;
+    cursor:pointer;
+    animation:flowerAppear 2s ease forwards;
+}
+
+@keyframes flowerAppear{
+    from{
+        opacity:0;
+        transform:scale(.3);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.stem{
+    position:absolute;
+    width:9px;
+    height:230px;
+    background:#55752d;
+    left:85px;
+    top:110px;
+    border-radius:10px;
+}
+
+.leaf{
+    position:absolute;
+    width:45px;
+    height:95px;
+    background:#648936;
+    border-radius:100% 0 100% 0;
+}
+
+.leaf.left{
+    left:35px;
+    top:230px;
+    transform:rotate(-35deg);
+}
+
+.leaf.right{
+    right:30px;
+    top:270px;
+    transform:rotate(35deg);
+}
+
+.flowerHead{
+    position:absolute;
+    width:150px;
+    height:150px;
+    left:15px;
+    top:0;
+}
+
+.petal{
+    position:absolute;
+    width:55px;
+    height:85px;
+    background:#ffd83d;
+    border-radius:50%;
+    left:47px;
+    top:32px;
+    transform-origin:28px 43px;
+    box-shadow:0 0 12px rgba(255,215,60,.35);
+}
+
+.p1{transform:rotate(0deg) translateY(-38px);}
+.p2{transform:rotate(45deg) translateY(-38px);}
+.p3{transform:rotate(90deg) translateY(-38px);}
+.p4{transform:rotate(135deg) translateY(-38px);}
+.p5{transform:rotate(180deg) translateY(-38px);}
+.p6{transform:rotate(225deg) translateY(-38px);}
+.p7{transform:rotate(270deg) translateY(-38px);}
+.p8{transform:rotate(315deg) translateY(-38px);}
+
+.center{
+    position:absolute;
+    width:58px;
+    height:58px;
+    background:#805116;
+    border-radius:50%;
+    left:46px;
+    top:46px;
+    box-shadow:0 0 15px rgba(130,80,20,.6);
+}
+
+.flowerHint{
+    margin-top:25px;
+    font-size:17px;
+    letter-spacing:2px;
+    opacity:.75;
+}
+
+
+/* MARIPOSA */
+
+.butterfly{
+    position:absolute;
+    width:60px;
+    height:40px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    z-index:5;
+    animation:flyAway 2.5s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+.wing{
+    position:absolute;
+    width:30px;
+    height:24px;
+    background:#f7d56b;
+    border-radius:70% 30% 70% 30%;
+}
+
+.wing.left{
+    left:0;
+    transform:rotate(-25deg);
+}
+
+.wing.right{
+    right:0;
+    transform:scaleX(-1) rotate(-25deg);
+}
+
+.body{
+    position:absolute;
+    width:6px;
+    height:35px;
+    background:#49351d;
+    left:27px;
+    top:2px;
+    border-radius:10px;
+}
+
+@keyframes flyAway{
+
+    0%{
+        left:50%;
+        top:50%;
+        transform:translate(-50%,-50%) scale(1);
+    }
+
+    30%{
+        left:60%;
+        top:42%;
+    }
+
+    60%{
+        left:75%;
+        top:30%;
+    }
+
+    100%{
+        left:110%;
+        top:15%;
+        transform:translate(-50%,-50%) scale(.7);
+    }
+
+}
+
+
+/* LLUVIA */
+
+#rainScene{
+    background:
+        linear-gradient(
+            to bottom,
+            #050505,
+            #151108
+        );
+}
+
+.rain{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+}
+
+.rainFlower{
+    position:absolute;
+    top:-80px;
+    font-size:25px;
+    animation:fall linear infinite;
+}
+
+@keyframes fall{
+
+    from{
+        transform:translateY(-100px) rotate(0deg);
+    }
+
+    to{
+        transform:translateY(110vh) rotate(360deg);
+    }
+
+}
+
+
+/* MENSAJE FINAL */
+
+.finalMessage{
+    font-size:clamp(27px,5vw,50px);
+    line-height:1.45;
+    max-width:850px;
+    z-index:3;
+}
+
+
+/* CORAZÓN */
+
+.heart{
+    margin-top:45px;
+    font-size:110px;
+    color:#ffd83d;
+    text-shadow:
+        0 0 15px #ffd83d,
+        0 0 35px #ffb900,
+        0 0 65px rgba(255,190,0,.7);
+    cursor:pointer;
+    animation:heartbeat 1.4s infinite;
     z-index:5;
 }
 
-#message.show{
-    opacity:1;
-}
+@keyframes heartbeat{
 
-#hint{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:11%;
-    text-align:center;
-    font-size:17px;
-    letter-spacing:2px;
-    opacity:0;
-    z-index:7;
-    pointer-events:none;
-    transition:opacity .6s ease;
-}
-
-#hint.show{
-    opacity:.8;
-}
-
-#heart{
-    position:fixed;
-    left:50%;
-    bottom:9%;
-    transform:translateX(-50%);
-    font-size:100px;
-    color:#ffd83d;
-    line-height:1;
-    opacity:0;
-    pointer-events:none;
-    z-index:10;
-    cursor:pointer;
-    text-shadow:
-        0 0 12px #ffd83d,
-        0 0 30px #ffc400,
-        0 0 60px rgba(255,190,0,.7);
-    transition:opacity .8s ease;
-}
-
-#heart.show{
-    opacity:1;
-    pointer-events:auto;
-    animation:pulse 1.4s infinite ease-in-out;
-}
-
-@keyframes pulse{
     0%,100%{
-        transform:translateX(-50%) scale(1);
+        transform:scale(1);
     }
+
     50%{
-        transform:translateX(-50%) scale(1.12);
+        transform:scale(1.13);
     }
+
 }
 
-#secret{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:30px;
-    font-size:clamp(27px,5vw,52px);
-    line-height:1.4;
-    opacity:0;
-    pointer-events:none;
-    z-index:20;
-    transition:opacity 1.5s ease;
-    text-shadow:0 0 25px rgba(255,215,80,.8);
+
+/* EXPLOSIÓN */
+
+#explosionScene{
+    background:#000;
 }
 
-#secret.show{
-    opacity:1;
+.explosion{
+    position:absolute;
+    width:20px;
+    height:20px;
+    background:#ffd83d;
+    border-radius:50%;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    animation:explode 2.5s ease forwards;
 }
 
-audio{
-    display:none;
+@keyframes explode{
+
+    0%{
+        width:20px;
+        height:20px;
+        opacity:1;
+        box-shadow:0 0 30px #ffd83d;
+    }
+
+    100%{
+        width:1600px;
+        height:1600px;
+        opacity:0;
+        box-shadow:0 0 200px #ffd83d;
+    }
+
 }
+
+
+/* SECRETO */
+
+.secretText{
+    font-size:clamp(27px,5vw,50px);
+    line-height:1.45;
+    max-width:850px;
+}
+
 </style>
 </head>
 
 <body>
 
-<canvas id="canvas"></canvas>
 
-<div id="message"></div>
+<!-- INTRO -->
 
-<div id="hint">toca la flor</div>
+<section id="intro1" class="scene active">
+    <div class="introText fade">
+        Hay algo que quería darte...
+    </div>
+</section>
 
-<div id="heart">♥</div>
 
-<div id="secret">
-    Y si algún día te preguntas<br>
-    por qué hice todo esto...<br><br>
-    la respuesta siempre vas a ser tú. 💛
-</div>
+<section id="intro2" class="scene">
+    <div class="introText fade">
+        pero no encontré la manera de hacerlo.
+    </div>
+</section>
+
+
+<section id="intro3" class="scene">
+    <div class="introText fade">
+        Así que hice esto.
+    </div>
+</section>
+
+
+<!-- FLOR -->
+
+<section id="flowerScene" class="scene">
+
+    <div class="flower" id="flower">
+
+        <div class="flowerHead">
+
+            <div class="petal p1"></div>
+            <div class="petal p2"></div>
+            <div class="petal p3"></div>
+            <div class="petal p4"></div>
+            <div class="petal p5"></div>
+            <div class="petal p6"></div>
+            <div class="petal p7"></div>
+            <div class="petal p8"></div>
+
+            <div class="center"></div>
+
+        </div>
+
+        <div class="stem"></div>
+
+        <div class="leaf left"></div>
+        <div class="leaf right"></div>
+
+    </div>
+
+    <div class="flowerHint">
+        toca la flor
+    </div>
+
+</section>
+
+
+<!-- MARIPOSA -->
+
+<section id="butterflyScene" class="scene">
+
+    <div class="butterfly">
+
+        <div class="wing left"></div>
+        <div class="wing right"></div>
+
+        <div class="body"></div>
+
+    </div>
+
+</section>
+
+
+<!-- LLUVIA -->
+
+<section id="rainScene" class="scene">
+
+    <div class="rain">
+
+        <span class="rainFlower" style="left:5%;animation-duration:5s;animation-delay:-1s;">🌼</span>
+        <span class="rainFlower" style="left:12%;animation-duration:7s;animation-delay:-4s;">🌼</span>
+        <span class="rainFlower" style="left:20%;animation-duration:6s;animation-delay:-2s;">🌼</span>
+        <span class="rainFlower" style="left:28%;animation-duration:8s;animation-delay:-6s;">🌼</span>
+        <span class="rainFlower" style="left:36%;animation-duration:5.5s;animation-delay:-3s;">🌼</span>
+        <span class="rainFlower" style="left:44%;animation-duration:7s;animation-delay:-5s;">🌼</span>
+        <span class="rainFlower" style="left:52%;animation-duration:6s;animation-delay:-1s;">🌼</span>
+        <span class="rainFlower" style="left:60%;animation-duration:8s;animation-delay:-7s;">🌼</span>
+        <span class="rainFlower" style="left:68%;animation-duration:5s;animation-delay:-2s;">🌼</span>
+        <span class="rainFlower" style="left:76%;animation-duration:7s;animation-delay:-4s;">🌼</span>
+        <span class="rainFlower" style="left:84%;animation-duration:6s;animation-delay:-1s;">🌼</span>
+        <span class="rainFlower" style="left:92%;animation-duration:8s;animation-delay:-5s;">🌼</span>
+
+    </div>
+
+    <div class="finalMessage">
+        Y esta es mi pequeña manera<br>
+        de darte algo bonito. 💛
+
+        <div class="heart" id="heart">
+            ♥
+        </div>
+    </div>
+
+</section>
+
+
+<!-- EXPLOSIÓN -->
+
+<section id="explosionScene" class="scene">
+
+    <div class="explosion"></div>
+
+</section>
+
+
+<!-- MENSAJE SECRETO -->
+
+<section id="secretScene" class="scene">
+
+    <div class="secretText">
+        Y si algún día te preguntas<br>
+        por qué hice todo esto...<br><br>
+        la respuesta siempre vas a ser tú. 💛
+    </div>
+
+</section>
+
 
 <audio id="music" preload="auto">
     <source src="./Álvaro Díaz - Reina Pepiada (Lyric Video).mp3" type="audio/mpeg">
 </audio>
 
+
 <script>
 
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+const scenes = {
 
-const message=document.getElementById("message");
-const hint=document.getElementById("hint");
-const heart=document.getElementById("heart");
-const secret=document.getElementById("secret");
-const music=document.getElementById("music");
+    intro1:document.getElementById("intro1"),
+    intro2:document.getElementById("intro2"),
+    intro3:document.getElementById("intro3"),
+    flower:document.getElementById("flowerScene"),
+    butterfly:document.getElementById("butterflyScene"),
+    rain:document.getElementById("rainScene"),
+    explosion:document.getElementById("explosionScene"),
+    secret:document.getElementById("secretScene")
 
-let W=innerWidth;
-let H=innerHeight;
-
-function resize(){
-
-    W=innerWidth;
-    H=innerHeight;
-
-    canvas.width=W;
-    canvas.height=H;
-
-}
-
-resize();
-
-addEventListener("resize",resize);
-
-
-// ==============================
-// ESTADOS
-// ==============================
-
-let scene="intro";
-let start=performance.now();
-
-function changeScene(next){
-
-    scene=next;
-    start=performance.now();
-
-    message.classList.remove("show");
-    hint.classList.remove("show");
-
-}
-
-function time(){
-
-    return performance.now()-start;
-
-}
-
-
-// ==============================
-// TEXTO
-// ==============================
-
-function showText(txt){
-
-    message.innerHTML=txt;
-    message.classList.add("show");
-
-}
-
-
-// ==============================
-// FLOR
-// ==============================
-
-const flower={
-    x:0,
-    y:0,
-    size:0
 };
 
-function drawFlower(progress){
+function show(name){
 
-    flower.x=W/2;
-    flower.y=H*.47;
+    Object.values(scenes).forEach(scene=>{
+        scene.classList.remove("active");
+    });
 
-    flower.size=75*progress;
-
-    const r=flower.size;
-
-    // tallo
-    ctx.beginPath();
-
-    ctx.moveTo(
-        flower.x,
-        flower.y+20
-    );
-
-    ctx.quadraticCurveTo(
-        flower.x-20,
-        flower.y+120,
-        flower.x-5,
-        H
-    );
-
-    ctx.strokeStyle="#53782c";
-    ctx.lineWidth=7;
-    ctx.stroke();
-
-
-    // hojas
-    ctx.beginPath();
-
-    ctx.ellipse(
-        flower.x-28,
-        flower.y+105,
-        18,
-        45,
-        -.6,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#668f32";
-    ctx.fill();
-
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        flower.x+28,
-        flower.y+140,
-        18,
-        45,
-        .6,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    // pétalos
-    for(let i=0;i<12;i++){
-
-        const angle=i*Math.PI*2/12;
-
-        ctx.save();
-
-        ctx.translate(
-            flower.x,
-            flower.y
-        );
-
-        ctx.rotate(angle);
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            -r*.62,
-            r*.42,
-            r*.76,
-            0,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#ffd83d";
-        ctx.fill();
-
-        ctx.restore();
-
-    }
-
-
-    // centro
-    ctx.beginPath();
-
-    ctx.arc(
-        flower.x,
-        flower.y,
-        r*.38,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#825317";
-    ctx.fill();
-
-
-    for(let i=0;i<18;i++){
-
-        const a=i*Math.PI*2/18;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            flower.x+
-            Math.cos(a)*r*.25,
-
-            flower.y+
-            Math.sin(a)*r*.25,
-
-            2,
-
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#b77918";
-        ctx.fill();
-
-    }
+    scenes[name].classList.add("active");
 
 }
 
 
-// ==============================
-// PARTÍCULAS
-// ==============================
+// INTRO
 
-let particles=[];
+setTimeout(()=>{
+    show("intro2");
+},4000);
 
-function burst(x,y){
 
-    particles=[];
+setTimeout(()=>{
+    show("intro3");
+},8000);
 
-    for(let i=0;i<120;i++){
 
-        const a=Math.random()*Math.PI*2;
-        const s=1+Math.random()*5;
+setTimeout(()=>{
+    show("flower");
+},12000);
 
-        particles.push({
 
-            x:x,
-            y:y,
+// FLOR
 
-            vx:Math.cos(a)*s,
-            vy:Math.sin(a)*s,
+document.getElementById("flower").addEventListener("click",()=>{
 
-            life:1,
-            size:1+Math.random()*4
+    show("butterfly");
 
-        });
+    setTimeout(()=>{
 
-    }
+        show("rain");
 
-}
+    },2600);
 
-function drawParticles(){
+});
 
-    for(let i=particles.length-1;i>=0;i--){
 
-        const p=particles[i];
-
-        p.x+=p.vx;
-        p.y+=p.vy;
-
-        p.vx*=.98;
-        p.vy*=.98;
-
-        p.vy+=.025;
-
-        p.life-=.018;
-
-        if(p.life<=0){
-
-            particles.splice(i,1);
-
-            continue;
-
-        }
-
-        ctx.globalAlpha=p.life;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#ffd84d";
-        ctx.fill();
-
-    }
-
-    ctx.globalAlpha=1;
-
-}
-
-
-// ==============================
-// MARIPOSA
-// ==============================
-
-function drawButterfly(p){
-
-    const x=
-        W/2+
-        (W+100-W/2)*p;
-
-    const y=
-        H*.47+
-        (H*.16-H*.47)*p+
-        Math.sin(p*10)*35*(1-p);
-
-    ctx.save();
-
-    ctx.translate(x,y);
-
-    ctx.rotate(-.2);
-
-    const flap=Math.sin(performance.now()*.025);
-
-    // ala izquierda
-    ctx.beginPath();
-
-    ctx.ellipse(
-        -9,
-        -3,
-        15,
-        9+flap*3,
-        -.5,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#f6d36a";
-    ctx.fill();
-
-
-    // ala derecha
-    ctx.beginPath();
-
-    ctx.ellipse(
-        9,
-        -3,
-        15,
-        9-flap*3,
-        .5,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#ffe28d";
-    ctx.fill();
-
-
-    // cuerpo
-    ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        0,
-        3,
-        11,
-        0,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#49351d";
-    ctx.fill();
-
-    ctx.restore();
-
-}
-
-
-// ==============================
-// LLUVIA DE FLORES
-// ==============================
-
-let rain=[];
-
-function createRain(){
-
-    rain=[];
-
-    for(let i=0;i<55;i++){
-
-        rain.push({
-
-            x:Math.random()*W,
-
-            y:-Math.random()*H,
-
-            size:5+Math.random()*9,
-
-            speed:1.5+Math.random()*2.5,
-
-            sway:Math.random()*10,
-
-            rotation:Math.random()*6,
-
-            rotationSpeed:(Math.random()-.5)*.025
-
-        });
-
-    }
-
-}
-
-function drawRainFlower(f){
-
-    ctx.save();
-
-    ctx.translate(f.x,f.y);
-
-    ctx.rotate(f.rotation);
-
-
-    for(let i=0;i<5;i++){
-
-        ctx.save();
-
-        ctx.rotate(i*Math.PI*2/5);
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            -f.size*.65,
-            f.size*.45,
-            f.size*.75,
-            0,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fillStyle="#ffd83d";
-        ctx.fill();
-
-        ctx.restore();
-
-    }
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        0,
-        f.size*.27,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle="#805117";
-    ctx.fill();
-
-    ctx.restore();
-
-}
-
-function updateRain(){
-
-    for(const f of rain){
-
-        f.y+=f.speed;
-
-        f.sway+=.025;
-
-        f.x+=Math.sin(f.sway)*.35;
-
-        f.rotation+=f.rotationSpeed;
-
-        if(f.y>H+30){
-
-            f.y=-20;
-            f.x=Math.random()*W;
-
-        }
-
-        drawRainFlower(f);
-
-    }
-
-}
-
-
-// ==============================
-// LOOP
-// ==============================
-
-function loop(){
-
-    ctx.fillStyle="#030303";
-    ctx.fillRect(0,0,W,H);
-
-    const t=time();
-
-
-    // INTRO
-    if(scene==="intro"){
-
-        if(t>400){
-
-            showText(
-                "Hay algo que quería darte..."
-            );
-
-        }
-
-        if(t>3300){
-
-            changeScene("intro2");
-
-            showText(
-                "pero no encontré la manera de hacerlo."
-            );
-
-        }
-
-    }
-
-
-    // SEGUNDO TEXTO
-    else if(scene==="intro2"){
-
-        if(t>3300){
-
-            changeScene("flower");
-
-            showText(
-                "Así que hice esto."
-            );
-
-        }
-
-    }
-
-
-    // FLOR
-    else if(scene==="flower"){
-
-        // el texto desaparece solo
-        if(t>1800){
-
-            message.classList.remove("show");
-
-        }
-
-        const p=Math.min(t/1500,1);
-
-        drawFlower(p);
-
-        if(t>1500){
-
-            hint.classList.add("show");
-
-        }
-
-    }
-
-
-    // MARIPOSA
-    else if(scene==="butterfly"){
-
-        const p=Math.min(t/2300,1);
-
-        drawFlower(1);
-
-        drawButterfly(p);
-
-        drawParticles();
-
-        if(t>500 && t<1600){
-
-            showText(
-                "Porque hay cosas que no caben en una simple flor."
-            );
-
-        }
-
-        if(p>=1){
-
-            createRain();
-
-            changeScene("rain");
-
-        }
-
-    }
-
-
-    // LLUVIA
-    else if(scene==="rain"){
-
-        updateRain();
-
-        if(t>1500){
-
-            changeScene("final");
-
-            showText(
-                "Y esta es mi pequeña manera<br>" +
-                "de darte algo bonito. 💛"
-            );
-
-        }
-
-    }
-
-
-    // FINAL
-    else if(scene==="final"){
-
-        updateRain();
-
-        if(t>2500){
-
-            changeScene("heart");
-
-            showText(
-                "Y esta es mi pequeña manera<br>" +
-                "de darte algo bonito. 💛"
-            );
-
-            heart.classList.add("show");
-
-        }
-
-    }
-
-
-    // CORAZÓN
-    else if(scene==="heart"){
-
-        updateRain();
-
-    }
-
-
-    // EXPLOSIÓN
-    else if(scene==="explosion"){
-
-        updateRain();
-
-        drawParticles();
-
-        const p=Math.min(t/2500,1);
-
-        const radius=p*Math.max(W,H);
-
-        const glow=ctx.createRadialGradient(
-            W/2,
-            H/2,
-            0,
-            W/2,
-            H/2,
-            radius
-        );
-
-        glow.addColorStop(
-            0,
-            "rgba(255,240,150,.9)"
-        );
-
-        glow.addColorStop(
-            .3,
-            "rgba(255,210,70,.35)"
-        );
-
-        glow.addColorStop(
-            1,
-            "rgba(255,190,0,0)"
-        );
-
-        ctx.fillStyle=glow;
-
-        ctx.fillRect(
-            0,
-            0,
-            W,
-            H
-        );
-
-
-        if(t>300 && music.paused){
-
-            music.volume=.7;
-
-            music.play().catch(()=>{});
-
-        }
-
-
-        if(t>2700){
-
-            changeScene("secret");
-
-            secret.classList.add("show");
-
-        }
-
-    }
-
-
-    // SECRETO
-    else if(scene==="secret"){
-
-        updateRain();
-
-    }
-
-
-    requestAnimationFrame(loop);
-
-}
-
-requestAnimationFrame(loop);
-
-
-// ==============================
-// TOCAR FLOR
-// ==============================
-
-function checkFlower(x,y){
-
-    if(scene!=="flower"){
-        return;
-    }
-
-    const dx=x-flower.x;
-    const dy=y-flower.y;
-
-    if(
-        Math.sqrt(dx*dx+dy*dy)<130
-    ){
-
-        hint.classList.remove("show");
-
-        burst(
-            flower.x,
-            flower.y
-        );
-
-        changeScene("butterfly");
-
-    }
-
-}
-
-canvas.addEventListener(
-    "click",
-    e=>{
-        checkFlower(
-            e.clientX,
-            e.clientY
-        );
-    }
-);
-
-canvas.addEventListener(
-    "touchstart",
-    e=>{
-
-        const touch=e.touches[0];
-
-        checkFlower(
-            touch.clientX,
-            touch.clientY
-        );
-
-    },
-    {passive:true}
-);
-
-
-// ==============================
 // CORAZÓN
-// ==============================
 
-heart.addEventListener(
-    "click",
-    ()=>{
+document.getElementById("heart").addEventListener("click",()=>{
 
-        heart.classList.remove("show");
+    show("explosion");
 
-        burst(
-            W/2,
-            H/2
-        );
+    const music=document.getElementById("music");
 
-        changeScene("explosion");
+    music.volume=.7;
 
-    }
-);
+    music.play().catch(()=>{});
+
+    setTimeout(()=>{
+
+        show("secret");
+
+    },2800);
+
+});
 
 </script>
 
