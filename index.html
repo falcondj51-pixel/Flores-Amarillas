@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para ti 🌻</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: #020204;
+    color: #fff8df;
+    font-family: "Cormorant Garamond", serif;
+}
+
+#scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(255, 193, 45, 0.06), transparent 30%),
+        #020204;
+}
+
+/* =========================
+   ESTRELLAS / PARTÍCULAS
+========================= */
+
+#particles,
+#finalParticles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ffd85a;
+    box-shadow: 0 0 10px #ffc928;
+    opacity: 0;
+    animation: particleAppear 2s forwards;
+}
+
+@keyframes particleAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: .8;
+        transform: scale(1);
+    }
+}
+
+/* =========================
+   INTRO
+========================= */
+
+#intro {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 25px;
+    z-index: 10;
+}
+
+#introText {
+    max-width: 700px;
+    font-size: clamp(28px, 5vw, 54px);
+    font-weight: 300;
+    line-height: 1.2;
+    opacity: 0;
+    transition: opacity 1.8s ease, filter 1.8s ease;
+}
+
+.fadeText {
+    opacity: 1 !important;
+}
+
+/* =========================
+   LUZ CENTRAL
+========================= */
+
+#light {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #ffe36a;
+    box-shadow:
+        0 0 20px #ffd43b,
+        0 0 60px rgba(255, 210, 60, .8),
+        0 0 140px rgba(255, 185, 20, .35);
+    opacity: 0;
+    transition: all 3s ease;
+}
+
+.lightGrow {
+    width: 180px !important;
+    height: 180px !important;
+    opacity: 1 !important;
+    box-shadow:
+        0 0 40px #ffe36a,
+        0 0 120px rgba(255, 210, 60, .8),
+        0 0 250px rgba(255, 170, 0, .4);
+}
+
+/* =========================
+   FLOR
+========================= */
+
+#flowerScene {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 2s ease;
+    z-index: 5;
+}
+
+#flowerScene.visible {
+    opacity: 1;
+}
+
+#flower {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    cursor: pointer;
+    transform: scale(0);
+    transition: transform 2s cubic-bezier(.2,.8,.2,1);
+    filter: drop-shadow(0 0 25px rgba(255,207,54,.55));
+}
+
+#flower.visible {
+    transform: scale(1);
+}
+
+.petal {
+    position: absolute;
+    width: 65px;
+    height: 95px;
+    left: 52px;
+    top: 5px;
+    border-radius: 50% 50% 45% 45%;
+    background: linear-gradient(to bottom, #fff16b, #e9a91d);
+    transform-origin: 50% 80%;
+    box-shadow: 0 0 15px rgba(255,211,54,.4);
+}
+
+.petal:nth-child(1) { transform: rotate(0deg) translateY(-20px); }
+.petal:nth-child(2) { transform: rotate(45deg) translateY(-20px); }
+.petal:nth-child(3) { transform: rotate(90deg) translateY(-20px); }
+.petal:nth-child(4) { transform: rotate(135deg) translateY(-20px); }
+.petal:nth-child(5) { transform: rotate(180deg) translateY(-20px); }
+.petal:nth-child(6) { transform: rotate(225deg) translateY(-20px); }
+.petal:nth-child(7) { transform: rotate(270deg) translateY(-20px); }
+.petal:nth-child(8) { transform: rotate(315deg) translateY(-20px); }
+
+.flowerCenter {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    left: 57px;
+    top: 57px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #8a4e06, #3e2104);
+    box-shadow: 0 0 20px rgba(255,190,40,.5);
+}
+
+/* =========================
+   TEXTO PARA TI
+========================= */
+
+#flowerText {
+    position: absolute;
+    bottom: 17%;
+    width: 100%;
+    text-align: center;
+    font-size: clamp(28px, 5vw, 48px);
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+#flowerText.visible {
+    opacity: 1;
+}
+
+/* =========================
+   MARIPOSA
+========================= */
+
+#butterfly {
+    position: absolute;
+    width: 65px;
+    height: 55px;
+    left: -100px;
+    top: 62%;
+    opacity: 0;
+    z-index: 8;
+    cursor: pointer;
+}
+
+#butterfly.visible {
+    opacity: 1;
+    animation: butterflyFlight 5s cubic-bezier(.25,.7,.25,1) forwards;
+}
+
+.wing {
+    position: absolute;
+    width: 30px;
+    height: 42px;
+    top: 3px;
+    background: linear-gradient(145deg, #ffe85b, #d99a16);
+    box-shadow: 0 0 15px rgba(255,213,55,.7);
+}
+
+.leftWing {
+    left: 0;
+    border-radius: 80% 20% 70% 30%;
+    transform-origin: right bottom;
+    animation: flap .45s infinite alternate ease-in-out;
+}
+
+.rightWing {
+    right: 0;
+    border-radius: 20% 80% 30% 70%;
+    transform-origin: left bottom;
+    animation: flap .45s infinite alternate-reverse ease-in-out;
+}
+
+.body {
+    position: absolute;
+    width: 8px;
+    height: 50px;
+    left: 29px;
+    top: 3px;
+    border-radius: 50%;
+    background: #352004;
+}
+
+@keyframes flap {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(65deg); }
+}
+
+@keyframes butterflyFlight {
+    0% {
+        left: -100px;
+        top: 65%;
+        transform: rotate(-10deg);
+    }
+
+    35% {
+        left: 25%;
+        top: 48%;
+        transform: rotate(8deg);
+    }
+
+    70% {
+        left: 55%;
+        top: 58%;
+        transform: rotate(-5deg);
+    }
+
+    100% {
+        left: 72%;
+        top: 70%;
+        transform: rotate(0deg);
+    }
+}
+
+/* =========================
+   TRAIL
+========================= */
+
+#trail {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 4;
+}
+
+#trail.visible {
+    opacity: 1;
+}
+
+.trailDot {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ffd83d;
+    box-shadow: 0 0 12px #ffc928;
+    animation: trailFade 1.5s forwards;
+}
+
+@keyframes trailFade {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(.1);
+    }
+}
+
+/* =========================
+   TEXTO MARIPOSA
+========================= */
+
+#butterflyText {
+    position: absolute;
+    left: 50%;
+    top: 35%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 850px;
+    text-align: center;
+    font-size: clamp(25px, 4vw, 45px);
+    line-height: 1.25;
+    opacity: 0;
+    transition: opacity 2s ease;
+    z-index: 7;
+}
+
+#butterflyText.visible {
+    opacity: 1;
+}
+
+/* =========================
+   ESCENA FINAL
+========================= */
+
+#finalFlowers {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 3s ease;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255,194,40,.08), transparent 40%),
+        linear-gradient(to bottom, #030305, #0c0802);
+}
+
+#finalFlowers.visible {
+    opacity: 1;
+}
+
+.miniFlower {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    transform: scale(0);
+    animation: flowerGrow 1.5s forwards;
+}
+
+.miniFlower::before,
+.miniFlower::after {
+    content: "";
+    position: absolute;
+    width: 13px;
+    height: 24px;
+    background: linear-gradient(to bottom, #fff16b, #d99b19);
+    border-radius: 50%;
+    left: 7px;
+    top: 0;
+    box-shadow: 0 0 8px rgba(255,211,55,.45);
+}
+
+.miniFlower::before {
+    transform: rotate(45deg);
+}
+
+.miniFlower::after {
+    transform: rotate(-45deg);
+}
+
+@keyframes flowerGrow {
+    from {
+        transform: scale(0) translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) translateY(0);
+        opacity: .9;
+    }
+}
+
+/* =========================
+   MENSAJE FINAL
+========================= */
+
+#finalMessage {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 850px;
+    text-align: center;
+    font-size: clamp(27px, 4.5vw, 50px);
+    line-height: 1.3;
+    opacity: 0;
+    filter: blur(12px);
+    transition:
+        opacity 3s ease,
+        filter 3s ease;
+    z-index: 20;
+}
+
+#finalMessage.visible {
+    opacity: 1;
+    filter: blur(0);
+}
+
+/* =========================
+   CORAZÓN
+========================= */
+
+#heart {
+    position: absolute;
+    left: 50%;
+    bottom: 13%;
+    transform: translateX(-50%) scale(1);
+    font-size: 75px;
+    cursor: pointer;
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 2s ease, transform .3s ease;
+    filter: drop-shadow(0 0 20px rgba(255,65,75,.6));
+    animation: heartBeat 1.5s infinite ease-in-out;
+}
+
+#heart.visible {
+    opacity: 1;
+}
+
+#heart:active {
+    transform: translateX(-50%) scale(.8);
+}
+
+@keyframes heartBeat {
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.12);
+    }
+}
+
+#heartHint {
+    position: absolute;
+    left: 50%;
+    bottom: 7%;
+    transform: translateX(-50%);
+    font-size: 19px;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 2s ease;
+    z-index: 30;
+}
+
+#heartHint.visible {
+    opacity: .7;
+}
+
+/* =========================
+   MENSAJE SECRETO
+========================= */
+
+#secretMessage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+    font-size: clamp(27px, 4.5vw, 50px);
+    line-height: 1.3;
+    opacity: 0;
+    filter: blur(10px);
+    transition:
+        opacity 3s ease,
+        filter 3s ease;
+    z-index: 50;
+}
+
+#secretMessage.visible {
+    opacity: 1;
+    filter: blur(0);
+}
+
+/* =========================
+   EXPLOSIÓN
+========================= */
+
+.explosionParticle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ffd83d;
+    box-shadow: 0 0 12px #ffca28;
+    pointer-events: none;
+    z-index: 45;
+    animation: explode 1.7s ease-out forwards;
+}
+
+@keyframes explode {
+    from {
+        transform: translate(0,0) scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: translate(var(--x), var(--y)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+
+    #flower {
+        width: 135px;
+        height: 135px;
+    }
+
+    .petal {
+        width: 52px;
+        height: 78px;
+        left: 42px;
+    }
+
+    .flowerCenter {
+        width: 45px;
+        height: 45px;
+        left: 45px;
+        top: 45px;
+    }
+
+    #heart {
+        font-size: 62px;
+        bottom: 14%;
+    }
+
+    #heartHint {
+        bottom: 8%;
+        font-size: 16px;
+    }
+
+    #butterflyText {
+        top: 30%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="scene">
+
+    <!-- INTRO -->
+    <div id="intro">
+        <div id="introText"></div>
+    </div>
+
+    <!-- LUZ -->
+    <div id="light"></div>
+
+    <!-- ESCENA DE LA FLOR -->
+    <div id="flowerScene">
+
+        <div id="flower">
+
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+
+            <div class="flowerCenter"></div>
+
+        </div>
+
+        <div id="flowerText">
+            Para ti.
+        </div>
+
+    </div>
+
+    <!-- PARTÍCULAS -->
+    <div id="particles"></div>
+
+    <!-- MARIPOSA -->
+    <div id="butterfly">
+
+        <div class="wing leftWing"></div>
+        <div class="wing rightWing"></div>
+        <div class="body"></div>
+
+    </div>
+
+    <!-- TRAIL -->
+    <div id="trail"></div>
+
+    <!-- TEXTO MARIPOSA -->
+    <div id="butterflyText">
+        Porque hay cosas que no caben en un mensaje...
+        <br>
+        ...y tú eres una de ellas.
+    </div>
+
+    <!-- ESCENA FINAL -->
+    <div id="finalFlowers"></div>
+
+    <!-- PARTÍCULAS FINALES -->
+    <div id="finalParticles"></div>
+
+    <!-- MENSAJE FINAL -->
+    <div id="finalMessage">
+        Aunque hoy no pueda dártelas en persona,
+        <br>
+        quería que tuvieras tus flores amarillas. 💛
+    </div>
+
+    <!-- CORAZÓN -->
+    <div id="heart">💛</div>
+
+    <div id="heartHint">
+        toca el corazón
+    </div>
+
+    <!-- MENSAJE SECRETO -->
+    <div id="secretMessage">
+        Y si te preguntas por qué hice todo esto...
+        <br><br>
+        es simplemente porque eres alguien
+        <br>
+        muy especial para mí.
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MÚSICA
+========================= -->
+
+<audio id="music" preload="auto">
+    <source
+        src="https://github.com/falcondj51-pixel/Flores-Amarillas/raw/refs/heads/main/%C3%81lvaro%20D%C3%ADaz%20-%20Reina%20Pepiada%20%28Lyric%20Video%29.mp3"
+        type="audio/mpeg">
+</audio>
+
+
+<script>
+
+/* ==========================================
+   ELEMENTOS
+========================================== */
+
+const introText = document.getElementById("introText");
+const intro = document.getElementById("intro");
+const light = document.getElementById("light");
+
+const flowerScene = document.getElementById("flowerScene");
+const flower = document.getElementById("flower");
+const flowerText = document.getElementById("flowerText");
+
+const particles = document.getElementById("particles");
+
+const butterfly = document.getElementById("butterfly");
+const butterflyText = document.getElementById("butterflyText");
+const trail = document.getElementById("trail");
+
+const finalFlowers = document.getElementById("finalFlowers");
+const finalParticles = document.getElementById("finalParticles");
+
+const finalMessage = document.getElementById("finalMessage");
+
+const heart = document.getElementById("heart");
+const heartHint = document.getElementById("heartHint");
+
+const secretMessage = document.getElementById("secretMessage");
+
+const music = document.getElementById("music");
+
+
+/* ==========================================
+   FUNCIONES
+========================================== */
+
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+function showText(text, duration = 2600) {
+
+    return new Promise(async resolve => {
+
+        introText.classList.remove("fadeText");
+
+        await wait(500);
+
+        introText.textContent = text;
+        introText.classList.add("fadeText");
+
+        await wait(duration);
+
+        introText.classList.remove("fadeText");
+
+        await wait(1000);
+
+        resolve();
+
+    });
+
+}
+
+
+/* ==========================================
+   PARTÍCULAS
+========================================== */
+
+function createParticles(amount = 80) {
+
+    for (let i = 0; i < amount; i++) {
+
+        const p = document.createElement("div");
+
+        p.className = "particle";
+
+        p.style.left = Math.random() * 100 + "%";
+        p.style.top = Math.random() * 100 + "%";
+
+        p.style.animationDelay =
+            Math.random() * 2 + "s";
+
+        p.style.transform =
+            `scale(${Math.random() * .8 + .3})`;
+
+        particles.appendChild(p);
+    }
+}
+
+
+/* ==========================================
+   EXPLOSIÓN
+========================================== */
+
+function createExplosion(amount = 180) {
+
+    const rect = heart.getBoundingClientRect();
+
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < amount; i++) {
+
+        const p = document.createElement("div");
+
+        p.className = "explosionParticle";
+
+        p.style.left = centerX + "px";
+        p.style.top = centerY + "px";
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 80 + Math.random() * 450;
+
+        p.style.setProperty(
+            "--x",
+            Math.cos(angle) * distance + "px"
+        );
+
+        p.style.setProperty(
+            "--y",
+            Math.sin(angle) * distance + "px"
+        );
+
+        p.style.animationDelay =
+            Math.random() * .2 + "s";
+
+        scene.appendChild(p);
+
+        setTimeout(() => {
+            p.remove();
+        }, 2200);
+    }
+}
+
+
+/* ==========================================
+   FLORES FINALES
+========================================== */
+
+function createFinalFlowers(amount = 75) {
+
+    for (let i = 0; i < amount; i++) {
+
+        const f = document.createElement("div");
+
+        f.className = "miniFlower";
+
+        f.style.left =
+            Math.random() * 96 + "%";
+
+        f.style.top =
+            Math.random() * 90 + "%";
+
+        f.style.animationDelay =
+            Math.random() * 2.5 + "s";
+
+        const scale =
+            .5 + Math.random() * .9;
+
+        f.style.transform =
+            `scale(${scale})`;
+
+        finalFlowers.appendChild(f);
+    }
+}
+
+
+/* ==========================================
+   PARTÍCULAS FINALES
+========================================== */
+
+function createFinalParticles(amount = 260) {
+
+    for (let i = 0; i < amount; i++) {
+
+        const p = document.createElement("div");
+
+        p.className = "particle";
+
+        p.style.left =
+            Math.random() * 100 + "%";
+
+        p.style.top =
+            Math.random() * 100 + "%";
+
+        p.style.animationDelay =
+            Math.random() * 4 + "s";
+
+        p.style.width =
+            (1.5 + Math.random() * 3) + "px";
+
+        p.style.height =
+            p.style.width;
+
+        finalParticles.appendChild(p);
+    }
+}
+
+
+/* ==========================================
+   TRAIL DE LA MARIPOSA
+========================================== */
+
+function createButterflyTrail() {
+
+    const interval = setInterval(() => {
+
+        if (!butterfly.classList.contains("visible")) {
+            clearInterval(interval);
+            return;
+        }
+
+        const rect = butterfly.getBoundingClientRect();
+
+        const dot = document.createElement("div");
+
+        dot.className = "trailDot";
+
+        dot.style.left =
+            rect.left + rect.width / 2 + "px";
+
+        dot.style.top =
+            rect.top + rect.height / 2 + "px";
+
+        trail.appendChild(dot);
+
+        setTimeout(() => {
+            dot.remove();
+        }, 1600);
+
+    }, 80);
+}
+
+
+/* ==========================================
+   MÚSICA
+========================================== */
+
+function startMusic() {
+
+    music.volume = 0;
+
+    music.currentTime = 0;
+
+    const playPromise = music.play();
+
+    if (playPromise !== undefined) {
+
+        playPromise
+            .then(() => {
+
+                let volume = 0;
+
+                const fade = setInterval(() => {
+
+                    volume += 0.02;
+
+                    music.volume =
+                        Math.min(volume, 1);
+
+                    if (volume >= 1) {
+                        clearInterval(fade);
+                    }
+
+                }, 100);
+
+            })
+            .catch(error => {
+
+                console.log(
+                    "La reproducción fue bloqueada:",
+                    error
+                );
+
+            });
+
+    }
+
+}
+
+
+/* ==========================================
+   SECUENCIA PRINCIPAL
+========================================== */
+
+async function startExperience() {
+
+    await wait(2500);
+
+    await showText(
+        "Hay algo que quería darte...",
+        2500
+    );
+
+    await showText(
+        "pero no encontré la manera de hacerlo.",
+        2800
+    );
+
+    await showText(
+        "Así que hice esto.",
+        2200
+    );
+
+    /* LUZ */
+
+    intro.style.opacity = "0";
+
+    await wait(1000);
+
+    light.classList.add("lightGrow");
+
+    createParticles(90);
+
+    await wait(2500);
+
+    /* FLOR */
+
+    flowerScene.classList.add("visible");
+
+    await wait(500);
+
+    flower.classList.add("visible");
+
+    await wait(1800);
+
+    flowerText.classList.add("visible");
+
+}
+
+
+/* ==========================================
+   CLICK EN LA FLOR
+========================================== */
+
+flower.addEventListener("click", async () => {
+
+    flower.style.pointerEvents = "none";
+
+    /* Explosión de partículas */
+
+    for (let i = 0; i < 80; i++) {
+
+        const p = document.createElement("div");
+
+        p.className = "explosionParticle";
+
+        const rect =
+            flower.getBoundingClientRect();
+
+        p.style.left =
+            rect.left + rect.width / 2 + "px";
+
+        p.style.top =
+            rect.top + rect.height / 2 + "px";
+
+        const angle =
+            Math.random() * Math.PI * 2;
+
+        const distance =
+            80 + Math.random() * 300;
+
+        p.style.setProperty(
+            "--x",
+            Math.cos(angle) * distance + "px"
+        );
+
+        p.style.setProperty(
+            "--y",
+            Math.sin(angle) * distance + "px"
+        );
+
+        scene.appendChild(p);
+
+        setTimeout(() => {
+            p.remove();
+        }, 1800);
+    }
+
+    flowerScene.style.opacity = "0";
+
+    await wait(1500);
+
+    /* MARIPOSA */
+
+    butterfly.classList.add("visible");
+
+    trail.classList.add("visible");
+
+    createButterflyTrail();
+
+    await wait(5000);
+
+    butterflyText.classList.add("visible");
+
+    await wait(4000);
+
+    butterfly.style.opacity = "0";
+
+    butterflyText.style.opacity = "0";
+
+    await wait(1800);
+
+    /* ESCENA FINAL */
+
+    finalFlowers.classList.add("visible");
+
+    createFinalFlowers(75);
+
+    createFinalParticles(260);
+
+    await wait(3000);
+
+    finalMessage.classList.add("visible");
+
+    await wait(3500);
+
+    heart.classList.add("visible");
+
+    heartHint.classList.add("visible");
+
+});
+
+
+/* ==========================================
+   CLICK EN EL CORAZÓN
+========================================== */
+
+heart.addEventListener("click", async () => {
+
+    heart.style.pointerEvents = "none";
+
+    heartHint.style.opacity = "0";
+
+    /* EXPLOSIÓN */
+
+    createExplosion(180);
+
+    /* MÚSICA */
+
+    startMusic();
+
+    await wait(1000);
+
+    finalMessage.style.opacity = "0";
+
+    heart.style.opacity = "0";
+
+    await wait(1800);
+
+    /* MENSAJE SECRETO */
+
+    secretMessage.classList.add("visible");
+
+});
+
+
+/* ==========================================
+   INICIAR
+========================================== */
+
+startExperience();
+
+</script>
+
+</body>
+</html>
